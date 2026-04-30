@@ -3,8 +3,16 @@
     {
       "id": "210497527:210497527",
       "data": {
+        "applyFor": null,
+        "recommendFor": null,
+        "apply": null
+      }
+    },
+    {
+      "id": "7206918794:7206918794",
+      "data": {
         "applyFor": "Маркетолог ",
-        "recommendFor": "Маркетолог "
+        "recommendFor": "Дизайнер"
       }
     }
   ]
