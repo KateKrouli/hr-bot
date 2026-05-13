@@ -1,99 +1,86 @@
 const SHEET_ID = "1p0oYa-bzPXpk-wEixBNnIIGzCKrzWAALhlhX_nzDyo4";
-const VACANCIES_RANGE = "Vacancies!A2:G"; // ID | Title | City | Description | Photo | PublishDate | TelegraLink
+const VACANCIES_RANGE = "Vacancies!A2:G";
 const RESPONSES_RANGE = "Responses!A:J";
 const RECOMMENDATIONS_RANGE = "Recommendations!A:E";
 
 function doGet(e) {
   try {
-    const action = e.parameter && e.parameter.action;
+    const action = e.parameter?.action;
     if (action === "getVacancies") {
-      return ContentService
-        .createTextOutput(JSON.stringify(getVacancies()))
-        .setMimeType(ContentService.MimeType.JSON);
+      const sheetId = e.parameter?.sheetId;
+      return jsonSuccess(getVacancies(sheetId));
     }
-
-    return jsonError("Unknown action");
+    return jsonError("Unknown action: " + (action || "no action provided"));
   } catch (err) {
-    console.error(err);
-    return jsonError("Internal error: " + (err.message || "Runtime exception"));
+    return jsonError("Internal error: " + err.message);
   }
 }
 
 function doPost(e) {
   try {
-    let payload;
-    try {
-      payload = JSON.parse(e.postData && e.postData.contents ? e.postData.contents : "{}");
-    } catch (err) {
-      return jsonError("Invalid JSON payload");
-    }
-
-    const action = payload.action || (e.parameter && e.parameter.action);
+    const body = JSON.parse(e.postData.contents || "{}");
+    const action = body.action;
     if (action === "saveResponse") {
-      return jsonSuccess(saveResponse(payload));
+      return jsonSuccess(saveResponse(body));
     }
     if (action === "saveRecommendation") {
-      return jsonSuccess(saveRecommendation(payload));
+      return jsonSuccess(saveRecommendation(body));
     }
-
-    return jsonError("Unknown action");
+    return jsonError("Unknown action: " + (action || "no action provided"));
   } catch (err) {
-    console.error(err);
-    return jsonError("Internal error: " + (err.message || "Runtime exception"));
+    return jsonError("Internal error: " + err.message);
   }
 }
 
-function getVacancies() {
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("Vacancies");
+function getVacancies(sheetId) {
+  const spreadsheetId = sheetId || SHEET_ID;
+  const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName("Vacancies");
   if (!sheet) return [];
   const rows = sheet.getRange(VACANCIES_RANGE).getValues();
-  return rows.filter(row => row.some(cell => cell !== "")).map(([id, title, city, description, photo, publishDate, telegraLink]) => ({
-    id: String(id || ""),
-    title: title || "",
-    city: city || "",
-    description: description || "",
-    photo: photo || "",
-    publishDate: publishDate || "",
-    telegraLink: telegraLink || "",
-  }));
+  return rows
+    .filter((row) => row.some((cell) => cell !== ""))
+    .map(([id, title, city, description, photo, publishDate, telegraLink]) => ({
+      id: String(id || ""),
+      title: String(title || ""),
+      city: String(city || ""),
+      description: String(description || ""),
+      photo: String(photo || ""),
+      publishDate: String(publishDate || ""),
+      telegraLink: String(telegraLink || ""),
+    }));
 }
 
 function saveResponse(payload) {
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("Responses");
+  const spreadsheetId = payload.sheetId || SHEET_ID;
+  const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName("Responses");
   if (!sheet) throw new Error("Лист Responses не найден");
-
   sheet.appendRow([
-    payload.vacancyTitle || "",   // A
-    payload.username || "",       // B
-    payload.name || "",           // C
-    payload.fullName || "",       // D
-    payload.birthDate || "",      // E
-    payload.contacts || "",       // F
-    payload.english || "",        // G
-    payload.nightShift || "",     // H
-    payload.cvLink || "",         // I
-
-    payload.createdAt || Utilities.formatDate(
-      new Date(),
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd HH:mm"
-    )                             // J
+    payload.createdAt || "",
+    payload.vacancyTitle || "",
+    payload.username || "",
+    payload.name || "",
+    payload.fullName || "",
+    payload.birthDate || "",
+    payload.contacts || "",
+    payload.english || "",
+    payload.nightShift || "",
+    payload.cvLink || "",
   ]);
-
-  return { success: true };
+  return { savedTo: spreadsheetId };
 }
 
 function saveRecommendation(payload) {
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName("Recommendations");
+  const spreadsheetId = payload.sheetId || SHEET_ID;
+  const sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName("Recommendations");
   if (!sheet) throw new Error("Лист Recommendations не найден");
   sheet.appendRow([
+    Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm"),
     payload.vacancyTitle || "",
     payload.username || "",
     payload.name || "",
     payload.recommendedUsername || "",
-    Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm"),
   ]);
-  return { success: true };
+  return { savedTo: spreadsheetId };
 }
 
 function jsonError(message) {

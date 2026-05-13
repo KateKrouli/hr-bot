@@ -5,7 +5,19 @@
       "data": {
         "applyFor": null,
         "recommendFor": null,
-        "apply": null
+        "apply": {
+          "step": 6,
+          "vacancy": "Дизайнер",
+          "sheetId": "1nBwbeFtdxqGhyX5qSvFeOdg3oX1-y7_ahxZzeTQRxX8",
+          "data": {
+            "name": "Test",
+            "birth": "Test",
+            "contacts": "Test",
+            "english": "Test",
+            "night": "Готов",
+            "cv": "https://api.telegram.org/file/bot7352494667:AAE4ozNZdOSg-gYTWKZjt-eREoKsk4UmYfg/documents/file_6.pdf"
+          }
+        }
       }
     },
     {
@@ -13,6 +25,12 @@
       "data": {
         "applyFor": "Маркетолог ",
         "recommendFor": "Дизайнер"
+      }
+    },
+    {
+      "id": "431746250:431746250",
+      "data": {
+        "apply": null
       }
     }
   ]

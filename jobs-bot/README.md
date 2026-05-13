@@ -79,6 +79,17 @@ https://script.google.com/macros/s/XXXX/exec
 BOT_TOKEN=your_telegram_bot_token
 GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/XXXX/exec
 
+# Уведомления о новых откликах
+NOTIFY_CHAT_IDS=12345678
+EMAIL_NOTIFY_TO=hr@example.com
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=smtp-user
+SMTP_PASS=smtp-password
+
+> Важно: используйте numeric `chat_id`, а не `@username`. После запуска бота отправьте ему команду `/myid` — он ответит вашим chat_id.
+
 📦 4. Установка и запуск
 npm install
 node index.js
